@@ -263,6 +263,7 @@ class PrintRegionConfig : public virtual StaticPrintConfig
     ConfigOptionFloat               perimeter_speed;
     ConfigOptionInt                 perimeters;
     ConfigOptionFloatOrPercent      small_perimeter_speed;
+    ConfigOptionFloat               small_perimeter_length;
     ConfigOptionFloat               solid_infill_below_area;
     ConfigOptionInt                 solid_infill_extruder;
     ConfigOptionFloatOrPercent      solid_infill_extrusion_width;
@@ -305,6 +306,7 @@ class PrintRegionConfig : public virtual StaticPrintConfig
         OPT_PTR(perimeter_speed);
         OPT_PTR(perimeters);
         OPT_PTR(small_perimeter_speed);
+        OPT_PTR(small_perimeter_length);
         OPT_PTR(solid_infill_below_area);
         OPT_PTR(solid_infill_extruder);
         OPT_PTR(solid_infill_extrusion_width);

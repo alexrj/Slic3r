@@ -445,7 +445,7 @@ sub options {
         infill_every_layers infill_only_where_needed
         solid_infill_every_layers fill_angle solid_infill_below_area 
         only_retract_when_crossing_perimeters infill_first
-        max_print_speed max_volumetric_speed
+        max_print_speed max_volumetric_speed small_perimeter_length
         perimeter_speed small_perimeter_speed external_perimeter_speed infill_speed 
         solid_infill_speed top_solid_infill_speed support_material_speed 
         support_material_interface_speed bridge_speed gap_fill_speed
@@ -631,9 +631,9 @@ sub build {
         {
             my $optgroup = $page->new_optgroup('Speed for print moves');
             $optgroup->append_single_option_line($_, undef, width => 100)
-                for qw(perimeter_speed small_perimeter_speed external_perimeter_speed
-                    infill_speed solid_infill_speed top_solid_infill_speed
-                    gap_fill_speed bridge_speed
+                for qw(perimeter_speed small_perimeter_speed small_perimeter_length 
+                    external_perimeter_speed infill_speed solid_infill_speed 
+                    top_solid_infill_speed gap_fill_speed bridge_speed
                     support_material_speed support_material_interface_speed
                 );
         }
@@ -887,7 +887,7 @@ sub _update {
     if (any { /$opt_key/ } qw(all_keys perimeters)) {
         $self->get_field($_)->toggle($have_perimeters)
             for qw(extra_perimeters thin_walls overhangs seam_position external_perimeters_first
-                    external_perimeter_extrusion_width
+                    external_perimeter_extrusion_width small_perimeter_length
                     perimeter_speed small_perimeter_speed external_perimeter_speed);
     }
 
