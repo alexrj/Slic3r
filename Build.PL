@@ -48,7 +48,9 @@ if ($gui) {
     Wx::GLCanvas                    0
     OpenGL                          0
     LWP::UserAgent                  0
+    Bundle::LWP                     0
     Net::Bonjour                    0
+    Net::SSL                        0
     );
     if ($^O eq 'MSWin32') {
         $recommends{"Win32::TieRegistry"} = 0;

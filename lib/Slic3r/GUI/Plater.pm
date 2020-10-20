@@ -33,6 +33,10 @@ use Wx::Event qw(EVT_BUTTON EVT_COMMAND EVT_KEY_DOWN EVT_MOUSE_EVENTS EVT_PAINT 
 use base qw(Wx::Panel Class::Accessor);
 use Slic3r::GUI::ColorScheme;
 
+use Net::SSL;
+$ENV{HTTPS_VERSION} = 3;
+$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
+
 __PACKAGE__->mk_accessors(qw(presets));
 
 use constant TB_ADD             => &Wx::NewId;
@@ -2424,13 +2428,21 @@ sub prepare_send {
             "Checking whether file already exists…", 100, $self, 0);
         $progress->Pulse;
 
+        my $host;
+        if ($self->{config}->print_host !~ /^http/) {
+            $host = "http://" . $self->{config}->print_host;
+        }
+        else {
+            $host = $self->{config}->print_host;
+        }
+
         my $ua = LWP::UserAgent->new;
         $ua->timeout(5);
         my $res;
         if ($self->{config}->print_host) {
             if($self->{config}->host_type eq 'octoprint'){
                 $res = $ua->get(
-                    "http://" . $self->{config}->print_host . "/api/files/local",
+                    $host . "/api/files/local",
                     'X-Api-Key' => $self->{config}->octoprint_apikey,
                 );
             }else {
@@ -2474,9 +2486,16 @@ sub send_gcode {
     my $filename = basename($self->{print}->output_filepath($main::opt{output} // ''));
     my $res;
     if($self->{config}->print_host){
+        my $host;
+        if ($self->{config}->print_host !~ /^http/) {
+            $host = "http://" . $self->{config}->print_host;
+        }
+        else {
+        $host = $self->{config}->print_host;
+        }
         if($self->{config}->host_type eq 'octoprint'){
             $res = $ua->post(
-                "http://" . $self->{config}->print_host . "/api/files/local",
+                $host . "/api/files/local",
                 Content_Type => 'form-data',
                 'X-Api-Key' => $self->{config}->octoprint_apikey,
                 Content => [

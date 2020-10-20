@@ -121,6 +121,7 @@ pp `
 -a "${STRAWBERRY_PATH}\c\bin\${glut};${glut}"  `
 -M AutoLoader `
 -M B `
+-M Bundle::LWP `
 -M Carp `
 -M Class::Accessor `
 -M Config `
@@ -161,6 +162,7 @@ pp `
 -M LWP::Protocol `
 -M LWP::Protocol::http `
 -M LWP::UserAgent `
+-M Net::SSL `
 -M List::Util `
 -M Math::Trig `
 -M Method::Generate::Accessor `

@@ -9,6 +9,9 @@ use Wx qw(:bookctrl :dialog :keycode :icon :id :misc :panel :sizer :treectrl :wi
     :button wxTheApp);
 use Wx::Event qw(EVT_BUTTON EVT_CHOICE EVT_KEY_DOWN EVT_TREE_SEL_CHANGED EVT_CHECKBOX);
 use base qw(Wx::Panel Class::Accessor);
+use Net::SSL;
+$ENV{HTTPS_VERSION} = 3;
+$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
 
 __PACKAGE__->mk_accessors(qw(current_preset config));
 
@@ -1388,9 +1391,15 @@ sub build {
             $host_line->append_button("Test", "wrench.png", sub {
                 my $ua = LWP::UserAgent->new;
                 $ua->timeout(10);
-
+                my $host;
+                if ($self->{config}->print_host !~ /^http/) {
+                    $host = "http://" . $self->{config}->print_host;
+                }
+                else {
+                    $host = $self->{config}->print_host;
+                }
                 my $res = $ua->get(
-                    "http://" . $self->config->print_host . "/api/version",
+                    $host . "/api/version",
                     'X-Api-Key' => $self->config->octoprint_apikey,
                 );
                 if ($res->is_success) {
