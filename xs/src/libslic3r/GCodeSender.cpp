@@ -504,8 +504,13 @@ GCodeSender::do_send()
     // stack and the buffer would lose its underlying storage causing memory corruption
     std::ostream os(&this->write_buffer);
     os << full_line;
+#ifdef ASYNC_SERIAL
     asio::async_write(this->serial, this->write_buffer, boost::bind(&GCodeSender::on_write, this, boost::asio::placeholders::error,
                 boost::asio::placeholders::bytes_transferred));
+#else
+    asio::write(this->serial, this->write_buffer);
+#endif
+
 }
 
 void
