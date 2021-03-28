@@ -490,6 +490,16 @@ sub process_layer {
         $pp->set('current_retraction' => $self->_gcodegen->writer->extruder->retracted);
         $gcode .= Slic3r::ConditionalGCode::apply_math($pp->process($self->print->config->layer_gcode) . "\n");
     }
+    if ($self->print->config->pause_gcode && $self->print->config->pause_heights) {
+        foreach my $height (split / /, $self->print->config->pause_heights) {
+            if ($height && $height eq $layer->print_z) {
+                my $pp = $self->_gcodegen->placeholder_parser->clone;
+                $pp->set('layer_num' => $self->_gcodegen->layer_index);
+                $pp->set('layer_z'   => $layer->print_z);
+                $gcode .= Slic3r::ConditionalGCode::apply_math($pp->process($self->print->config->pause_gcode) . "\n");
+            }
+        }
+    }
     
     # extrude skirt along raft layers and normal object layers
     # (not along interlaced support material layers)

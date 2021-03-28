@@ -325,6 +325,8 @@ class PrintRegionConfig : public virtual StaticPrintConfig
 class GCodeConfig : public virtual StaticPrintConfig
 {
     public:
+    ConfigOptionString              pause_gcode;
+    ConfigOptionString              pause_heights;
     ConfigOptionString              before_layer_gcode;
     ConfigOptionString              between_objects_gcode;
     ConfigOptionString              end_gcode;
@@ -370,6 +372,8 @@ class GCodeConfig : public virtual StaticPrintConfig
     }
     
     virtual ConfigOption* optptr(const t_config_option_key &opt_key, bool create = false) {
+        OPT_PTR(pause_gcode);
+        OPT_PTR(pause_heights);
         OPT_PTR(before_layer_gcode);
         OPT_PTR(between_objects_gcode);
         OPT_PTR(end_gcode);

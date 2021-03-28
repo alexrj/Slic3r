@@ -86,6 +86,22 @@ PrintConfigDef::PrintConfigDef()
     def->height = 50;
     def->default_value = new ConfigOptionString("");
 
+    def = this->add("pause_gcode", coString);
+    def->label = "Pause G-code";
+    def->tooltip = "This custom code is inserted at every layer change corresponding to the \"Pause Heights\" setting. It is inserted right after retraction and Z-Hop. Note that you can use placeholder variables for all Slic3r settings as well as [layer_num] and [layer_z].";
+    def->cli = "pause-gcode=s";
+    def->multiline = true;
+    def->full_width = true;
+    def->height = 50;
+    def->default_value = new ConfigOptionString("");
+
+    def = this->add("pause_heights", coString);
+    def->label = "Pause Heights";
+    def->category = "Layers and Perimeters";
+    def->tooltip = "A list of heights separated by spaces. When generating G-code, your \"Pause G-code\" will be inserted at these heights.";
+    def->cli = "pause_heights=s";
+    def->default_value = new ConfigOptionString("");
+
     def = this->add("between_objects_gcode", coString);
     def->label = __TRANS("Between objects G-code");
     def->tooltip = __TRANS("This code is inserted between objects when using sequential printing. By default extruder and bed temperature are reset using non-wait command; however if M104, M109, M140 or M190 are detected in this custom code, Slic3r will not add temperature commands. Note that you can use placeholder variables for all Slic3r settings, so you can put a \"M109 S[first_layer_temperature]\" command wherever you want.");

@@ -1,4 +1,4 @@
-use Test::More tests => 16;
+use Test::More tests => 17;
 use strict;
 use warnings;
 
@@ -130,6 +130,30 @@ use Slic3r::Test;
     is_deeply \@before, \@change, 'layer_num is consistent before and after layer changes';
     ok !defined(first { $change[$_] != $change[$_-1]+1 } 1..$#change),
         'layer_num grows continously';  # i.e. no duplicates or regressions
+}
+{
+    my $config = Slic3r::Config->new_from_defaults;
+    $config->set('pause_gcode', ';PAUSE [layer_z]');
+    $config->set('layer_gcode', ';LAYER [layer_z]');
+    $config->set('pause_heights', '0.55 2.45 5.15 5.95');
+    $config->set('support_material', 1);
+    $config->set('layer_height', 0.2);
+    my $print = Slic3r::Test::init_print('overhang', config => $config);
+    my $gcode = Slic3r::Test::gcode($print);
+
+    my $layer = 0;;
+    my @pauses = ();
+    foreach my $line (split /\R+/, $gcode) {
+        if ($line =~ /;LAYER (\d+.\d+)/) {
+            $layer = $1;
+        } elsif ($line =~ /;PAUSE (\d+.\d+)/) {
+            push @pauses, $1;
+            fail 'inconsistent layer_num before and after layer change'
+                if $1 != $layer;
+        }
+    }
+
+    is join (" ", @pauses), "0.55 2.45 5.15 5.95", "paused at correct layers";
 }
 
 {

@@ -440,7 +440,7 @@ sub options {
         perimeters spiral_vase
         top_solid_layers min_shell_thickness min_top_bottom_shell_thickness bottom_solid_layers
         extra_perimeters avoid_crossing_perimeters thin_walls overhangs
-        seam_position external_perimeters_first
+        seam_position external_perimeters_first pause_heights
         fill_density fill_pattern top_infill_pattern bottom_infill_pattern fill_gaps
         infill_every_layers infill_only_where_needed
         solid_infill_every_layers fill_angle solid_infill_below_area 
@@ -547,6 +547,7 @@ sub build {
             my $optgroup = $page->new_optgroup('Advanced');
             $optgroup->append_single_option_line('seam_position');
             $optgroup->append_single_option_line('external_perimeters_first');
+            $optgroup->append_single_option_line('pause_heights');
         }
     }
     
@@ -1257,7 +1258,7 @@ sub options {
         host_type print_host octoprint_apikey
         use_firmware_retraction pressure_advance vibration_limit
         use_volumetric_e
-        start_gcode end_gcode before_layer_gcode layer_gcode toolchange_gcode between_objects_gcode
+        start_gcode end_gcode before_layer_gcode layer_gcode pause_gcode toolchange_gcode between_objects_gcode
         nozzle_diameter extruder_offset min_layer_height max_layer_height
         retract_length retract_lift retract_speed retract_restart_extra retract_before_travel retract_layer_change wipe
         retract_length_toolchange retract_restart_extra_toolchange retract_lift_above retract_lift_below
@@ -1455,6 +1456,15 @@ sub build {
                 label_width => 0,
             );
             my $option = $optgroup->get_option('layer_gcode');
+            $option->full_width(1);
+            $option->height(150);
+            $optgroup->append_single_option_line($option);
+        }
+        {
+            my $optgroup = $page->new_optgroup('Pause G-code',
+                label_width => 0,
+            );
+            my $option = $optgroup->get_option('pause_gcode');
             $option->full_width(1);
             $option->height(150);
             $optgroup->append_single_option_line($option);
