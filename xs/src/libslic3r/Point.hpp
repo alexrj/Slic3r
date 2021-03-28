@@ -47,6 +47,7 @@ class Point
     static Point new_scale(Pointf p);
     bool operator==(const Point& rhs) const;
     bool operator!=(const Point& rhs) const { return !(*this == rhs); }
+    bool operator<(const Point& rhs) const { return this->x < rhs.x || (this->x == rhs.x && this->y < rhs.y); }
     std::string wkt() const;
     std::string dump_perl() const;
     void scale(double factor);
@@ -73,6 +74,7 @@ class Point
     bool nearest_point(const Points &points, Point* point) const;
     bool nearest_waypoint(const Points &points, const Point &dest, Point* point) const;
     double distance_to(const Point &point) const;
+    double distance_to_sq(const Point &point) const;
     double distance_to(const Line &line) const;
     double perp_distance_to(const Line &line) const;
     double ccw(const Point &p1, const Point &p2) const;
@@ -80,6 +82,7 @@ class Point
     double ccw_angle(const Point &p1, const Point &p2) const;
     Point projection_onto(const MultiPoint &poly) const;
     Point projection_onto(const Line &line) const;
+    Point interpolate(const double percent, const Point &p) const;
     Point negative() const;
     Vector vector_to(const Point &point) const;
     void align_to_grid(const Point &spacing, const Point &base = Point(0,0));
@@ -129,6 +132,8 @@ class Pointf
     bool operator==(const Pointf& rhs) const;
     bool coincides_with_epsilon(const Pointf& rhs) const;
     Pointf& operator/=(const double& scalar); 
+    bool operator!=(const Pointf &rhs) const { return ! (*this == rhs); }
+    bool operator< (const Pointf& rhs) const { return this->x < rhs.x || (this->x == rhs.x && this->y < rhs.y); }
 
     std::string wkt() const;
     std::string dump_perl() const;
@@ -143,8 +148,13 @@ class Pointf
 
 Pointf operator+(const Pointf& point1, const Pointf& point2);
 Pointf operator/(const Pointf& point1, const double& scalar);
-
-std::ostream& operator<<(std::ostream &stm, const Pointf3 &pointf3);
+inline Pointf operator*(double scalar, const Pointf& p) { return Pointf(scalar * p.x, scalar * p.y); }
+inline Pointf operator*(const Pointf& p, double scalar) { return Pointf(scalar * p.x, scalar * p.y); }
+inline Vectorf normalize(const Vectorf& v)
+{
+    coordf_t len = sqrt((v.x*v.x) + (v.y*v.y));
+    return (len != 0.0) ? 1.0 / len * v : Vectorf(0.0, 0.0);
+}
 
 class Pointf3 : public Pointf
 {
@@ -161,6 +171,8 @@ class Pointf3 : public Pointf
     Pointf3 negative() const;
     Vectorf3 vector_to(const Pointf3 &point) const;
 };
+
+std::ostream& operator<<(std::ostream &stm, const Pointf3 &pointf3);
 
 template <class T>
 inline Points

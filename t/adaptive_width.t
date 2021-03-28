@@ -32,6 +32,7 @@ sub scale_points (@) { map [scale $_->[X], scale $_->[Y]], @_ }
             expolygon       => $expolygon,
         ));
         my $config          = Slic3r::Config::Full->new;
+        $config->set('thin_walls_overlap',0);
         my $loops           = Slic3r::ExtrusionPath::Collection->new;
         my $gap_fill        = Slic3r::ExtrusionPath::Collection->new;
         my $fill_surfaces   = Slic3r::Surface::Collection->new;

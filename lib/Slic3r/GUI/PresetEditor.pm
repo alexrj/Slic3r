@@ -439,7 +439,8 @@ sub options {
         adaptive_slicing adaptive_slicing_quality match_horizontal_surfaces
         perimeters spiral_vase
         top_solid_layers min_shell_thickness min_top_bottom_shell_thickness bottom_solid_layers
-        extra_perimeters avoid_crossing_perimeters thin_walls overhangs
+        extra_perimeters avoid_crossing_perimeters 
+        thin_walls thin_walls_min_width thin_walls_overlap overhangs
         seam_position external_perimeters_first
         fill_density fill_pattern top_infill_pattern bottom_infill_pattern fill_gaps
         infill_every_layers infill_only_where_needed
@@ -540,7 +541,13 @@ sub build {
             my $optgroup = $page->new_optgroup('Quality (slower slicing)');
             $optgroup->append_single_option_line('extra_perimeters');
             $optgroup->append_single_option_line('avoid_crossing_perimeters');
-            $optgroup->append_single_option_line('thin_walls');
+            my $line = Slic3r::GUI::OptionsGroup::Line->new(
+                label => 'Detect thin walls',
+            );
+            $line->append_option($optgroup->get_option('thin_walls'));
+            $line->append_option($optgroup->get_option('thin_walls_min_width'));
+            $line->append_option($optgroup->get_option('thin_walls_overlap'));
+            $optgroup->append_line($line);
             $optgroup->append_single_option_line('overhangs');
         }
         {
@@ -888,8 +895,9 @@ sub _update {
     my $have_perimeters = ($config->perimeters > 0) || ($config->min_shell_thickness > 0);
     if (any { /$opt_key/ } qw(all_keys perimeters)) {
         $self->get_field($_)->toggle($have_perimeters)
-            for qw(extra_perimeters thin_walls overhangs seam_position external_perimeters_first
-                    external_perimeter_extrusion_width
+            for qw(extra_perimeters thin_walls thin_walls_min_width thin_walls_overlap
+                    overhangs seam_position 
+                    external_perimeters_first external_perimeter_extrusion_width
                     perimeter_speed small_perimeter_speed external_perimeter_speed);
     }
 
@@ -975,6 +983,10 @@ sub _update {
     $self->get_field($_)->toggle($have_support_material && $have_support_interface)
         for qw(support_material_interface_spacing support_material_interface_extruder
             support_material_interface_speed);
+        
+    # thin walls settigns only when thins walls is activated
+    $self->get_field($_)->toggle($config->thin_walls)
+        for qw(thin_walls_min_width thin_walls_overlap);
     
     $self->get_field('perimeter_extrusion_width')->toggle($have_perimeters || $have_skirt || $have_brim);
     $self->get_field('support_material_extruder')->toggle($have_support_material || $have_skirt);

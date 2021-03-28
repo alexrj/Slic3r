@@ -218,6 +218,7 @@ add_library(libslic3r STATIC
     ${LIBDIR}/libslic3r/LayerHeightSpline.cpp
     ${LIBDIR}/libslic3r/Line.cpp
     ${LIBDIR}/libslic3r/Log.cpp
+    ${LIBDIR}/libslic3r/MedialAxis.cpp
     ${LIBDIR}/libslic3r/Model.cpp
     ${LIBDIR}/libslic3r/MotionPlanner.cpp
     ${LIBDIR}/libslic3r/MultiPoint.cpp
@@ -334,6 +335,7 @@ set(SLIC3R_TEST_SOURCES
     ${TESTDIR}/libslic3r/test_printobject.cpp
     ${TESTDIR}/libslic3r/test_skirt_brim.cpp
     ${TESTDIR}/libslic3r/test_test_data.cpp
+    ${TESTDIR}/libslic3r/test_thin.cpp
     ${TESTDIR}/libslic3r/test_transformationmatrix.cpp
     ${TESTDIR}/libslic3r/test_trianglemesh.cpp
     ${TESTDIR}/libslic3r/test_extrusion_entity.cpp

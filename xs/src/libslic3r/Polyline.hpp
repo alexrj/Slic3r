@@ -36,14 +36,25 @@ class Polyline : public MultiPoint {
     Polygons grow(double delta, double scale = CLIPPER_OFFSET_SCALE, ClipperLib::JoinType joinType = ClipperLib::jtSquare, double miterLimit = 3.0) const;
 };
 
+
+/// ThickPolyline : a polyline with a width for each point
+/// This class has a vector of coordf_t, it must be the same size as points.
+/// it's used to store the size of the line at this point.
+/// Also, the endpoint let us know if the front() and back() of the polyline 
+/// join something or is a dead-end.
 class ThickPolyline : public Polyline {
     public:
+    /// width size must be == point size
     std::vector<coordf_t> width;
+    /// if true => it's an endpoint, if false it join an other ThickPolyline. first is at front(), second is at back()
     std::pair<bool,bool> endpoints;
     ThickPolyline() : endpoints(std::make_pair(false, false)) {};
     ThickLines thicklines() const;
     void reverse();
 };
+
+/// concatenate poylines if possible and refresh the endpoints
+void concatThickPolylines(ThickPolylines &polylines);
 
 inline Polylines
 to_polylines(const Polygons &polygons)

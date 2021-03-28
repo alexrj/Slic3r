@@ -821,16 +821,16 @@ PrintConfigDef::PrintConfigDef()
     def->default_value = new ConfigOptionInt(100);
 
     def = this->add("max_layer_height", coFloats);
-	def->label = "Max";
-	def->tooltip = "This is the highest printable layer height for this extruder and limits the resolution for adaptive slicing. Typical values are slightly smaller than nozzle_diameter.";
-	def->sidetext = "mm";
-	def->cli = "max-layer-height=f@";
-	def->min = 0;
-	{
-		ConfigOptionFloats* opt = new ConfigOptionFloats();
-		opt->values.push_back(0.3);
-		def->default_value = opt;
-	}
+    def->label = "Max";
+    def->tooltip = "This is the highest printable layer height for this extruder and limits the resolution for adaptive slicing. Typical values are slightly smaller than nozzle_diameter.";
+    def->sidetext = "mm";
+    def->cli = "max-layer-height=f@";
+    def->min = 0;
+    {
+        ConfigOptionFloats* opt = new ConfigOptionFloats();
+        opt->values.push_back(0.3);
+        def->default_value = opt;
+    }
 
     def = this->add("max_print_speed", coFloat);
     def->label = __TRANS("Max print speed");
@@ -1619,11 +1619,27 @@ PrintConfigDef::PrintConfigDef()
     }
     
     def = this->add("thin_walls", coBool);
-    def->label = __TRANS("Detect thin walls");
+    def->label = __TRANS("");
     def->category = __TRANS("Layers and Perimeters");
     def->tooltip = __TRANS("Detect single-width walls (parts where two extrusions don't fit and we need to collapse them into a single trace).");
     def->cli = "thin-walls!";
     def->default_value = new ConfigOptionBool(true);
+
+    def = this->add("thin_walls_min_width", coFloatOrPercent);
+    def->label = __TRANS("min width");
+    def->category = __TRANS("Layers and Perimeters");
+    def->tooltip = __TRANS("Minimum width for the extrusion to be extruded (widths lower than the nozzle diameter will be over-extruded at the nozzle diameter). Can be percent of the nozzle size.");
+    def->cli = "thin-walls-min-width=s";
+    def->min = 0;
+    def->default_value = new ConfigOptionFloatOrPercent(33, true);
+
+    def = this->add("thin_walls_overlap", coFloatOrPercent);
+    def->label = __TRANS("overlap");
+    def->category = __TRANS("Layers and Perimeters");
+    def->tooltip = __TRANS("Overlap between the thin walls and the perimeters. Can be a % of the external perimeter width (default 50%)");
+    def->cli = "thin-walls-overlap=s";
+    def->min = 0;
+    def->default_value = new ConfigOptionFloatOrPercent(50, true);
 
     def = this->add("threads", coInt);
     def->label = __TRANS("Threads");

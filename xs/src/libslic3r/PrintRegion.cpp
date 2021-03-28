@@ -82,6 +82,8 @@ PrintRegion::invalidate_state_by_config(const PrintConfigBase &config)
             || opt_key == "first_layer_extrusion_width"
             || opt_key == "perimeter_extrusion_width"
             || opt_key == "thin_walls"
+            || opt_key == "thin_walls_min_width"
+            || opt_key == "thin_walls_overlap"
             || opt_key == "external_perimeters_first") {
             steps.insert(posPerimeters);
         } else if (opt_key == "first_layer_extrusion_width") {

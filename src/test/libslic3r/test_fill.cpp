@@ -421,6 +421,7 @@ bool test_if_solid_surface_filled(const ExPolygon& expolygon, double flow_spacin
     Flow flow(flow_spacing, 0.4, flow_spacing);
 
     filler->min_spacing = flow.spacing();
+    filler->density = density;
 
     Polylines paths {filler->fill_surface(surface)};
 

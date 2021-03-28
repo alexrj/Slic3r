@@ -86,8 +86,6 @@ public:
     
     ExtrusionEntityCollection _traverse_loops(const PerimeterGeneratorLoops &loops,
         ThickPolylines &thin_walls) const;
-    ExtrusionEntityCollection _variable_width
-        (const ThickPolylines &polylines, ExtrusionRole role, Flow flow) const;
 };
 
 }

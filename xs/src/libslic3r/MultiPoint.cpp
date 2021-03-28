@@ -158,6 +158,30 @@ MultiPoint::intersection(const Line& line, Point* intersection) const
     return false;
 }
 
+bool
+MultiPoint::first_intersection(const Line& line, Point* intersection) const
+{
+    bool   found = false;
+    double dmin  = 0.;
+    for (const Line &l : this->lines()) {
+        Point ip;
+        if (l.intersection(line, &ip)) {
+            if (! found) {
+                found = true;
+                dmin = ip.distance_to(line.a);
+                *intersection = ip;
+            } else {
+                double d = ip.distance_to(line.a);
+                if (d < dmin) {
+                    dmin = d;
+                    *intersection = ip;
+                }
+            }
+        }
+    }
+    return found;
+}
+
 std::string
 MultiPoint::dump_perl() const
 {

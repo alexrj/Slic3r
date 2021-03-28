@@ -44,8 +44,10 @@ class ExPolygon
     Polygons simplify_p(double tolerance) const;
     ExPolygons simplify(double tolerance) const;
     void simplify(double tolerance, ExPolygons* expolygons) const;
-    void medial_axis(const ExPolygon &bounds, double max_width, double min_width, ThickPolylines* polylines) const;
+    void remove_point_too_near(const coord_t tolerance);
+    ///TODO: remove that function. It's kept only because of perl tests.
     void medial_axis(double max_width, double min_width, Polylines* polylines) const;
+    void medial_axis(const ExPolygon &bounds, double max_width, double min_width, ThickPolylines* polylines) const;
     void get_trapezoids(Polygons* polygons) const;
     void get_trapezoids(Polygons* polygons, double angle) const;
     void get_trapezoids2(Polygons* polygons) const;

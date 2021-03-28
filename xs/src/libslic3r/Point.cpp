@@ -193,6 +193,14 @@ Point::distance_to(const Point &point) const
     return sqrt(dx*dx + dy*dy);
 }
 
+double
+Point::distance_to_sq(const Point &point) const
+{
+    double dx = ((double)point.x - this->x);
+    double dy = ((double)point.y - this->y);
+    return dx*dx + dy*dy;
+}
+
 /* distance to the closest point of line */
 double
 Point::distance_to(const Line &line) const
@@ -268,8 +276,8 @@ Point::projection_onto(const MultiPoint &poly) const
     for (Lines::const_iterator line = lines.begin(); line != lines.end(); ++line) {
         Point point_temp = this->projection_onto(*line);
         if (this->distance_to(point_temp) < running_min) {
-	        running_projection = point_temp;
-	        running_min = this->distance_to(running_projection);
+            running_projection = point_temp;
+            running_min = this->distance_to(running_projection);
         }
     }
     return running_projection;
@@ -301,6 +309,19 @@ Point::projection_onto(const Line &line) const
     } else {
         return line.b;
     }
+}
+
+/// This method create a new point on the line defined by this and p2.
+/// The new point is place at position defined by |p2-this| * percent, starting from this
+/// \param percent the proportion of the segment length to place the point
+/// \param p2 the second point, forming a segment with this
+/// \return a new point, == this if percent is 0 and == p2 if percent is 1
+Point Point::interpolate(const double percent, const Point &p2) const
+{
+    Point p_out;
+    p_out.x = this->x*(1 - percent) + p2.x*(percent);
+    p_out.y = this->y*(1 - percent) + p2.y*(percent);
+    return p_out;
 }
 
 Point

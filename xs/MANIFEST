@@ -121,6 +121,8 @@ src/libslic3r/libslic3r.h
 src/libslic3r/Line.cpp
 src/libslic3r/Line.hpp
 src/libslic3r/Log.hpp
+src/libslic3r/MedialAxis.cpp
+src/libslic3r/MedialAxis.hpp
 src/libslic3r/Model.cpp
 src/libslic3r/Model.hpp
 src/libslic3r/MotionPlanner.cpp

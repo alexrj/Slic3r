@@ -93,10 +93,10 @@ SCENARIO(" Bridge flow specifics.", "[!mayfail]") {
 SCENARIO("Flow: Flow math for non-bridges", "[!mayfail]") {
     GIVEN("Nozzle Diameter of 0.4, a desired width of 1mm and layer height of 0.5") {
         auto width {ConfigOptionFloatOrPercent(1.0, false)};
-        float spacing {0.4};
-        float nozzle_diameter {0.4};
-        float bridge_flow {1.0};
-        float layer_height {0.5};
+        float spacing {0.4f};
+        float nozzle_diameter {0.4f};
+        float bridge_flow {1.0f};
+        float layer_height {0.5f};
 
         // Spacing for non-bridges is has some overlap
         THEN("External perimeter flow has spacing fixed to 1.1*nozzle_diameter") {
@@ -117,10 +117,10 @@ SCENARIO("Flow: Flow math for non-bridges", "[!mayfail]") {
     }
     /// Check the min/max
     GIVEN("Nozzle Diameter of 0.25") {
-        float spacing {0.4};
-        float nozzle_diameter {0.25};
-        float bridge_flow {0.0};
-        float layer_height {0.5};
+        float spacing {0.4f};
+        float nozzle_diameter {0.25f};
+        float bridge_flow {0.0f};
+        float layer_height {0.5f};
         WHEN("layer height is set to 0.2") {
             layer_height = 0.15f;
             THEN("Max width is set.") {

@@ -84,7 +84,7 @@ bool LayerHeightSpline::updateLayerHeights(std::vector<coordf_t> heights)
         this->_layer_heights = heights;
         result = this->_updateBSpline();
     }else{
-        std::cerr << "Unable to update layer heights. You provided " << heights.size() << " layers, but " << this->_layers.size()-1 << " expected" << std::endl;
+        std::cout << "Unable to update layer heights. You provided " << heights.size() << " layers, but " << this->_layers.size()-1 << " expected" << std::endl;
     }
 
     this->_layers_updated = false;
@@ -193,7 +193,7 @@ bool LayerHeightSpline::_updateBSpline()
         result = true;
     } else {
         result = false;
-        std::cerr << "Spline setup failed." << std::endl;
+        std::cout << "Spline setup failed." << std::endl;
     }
 
     this->_is_valid = result;

@@ -269,6 +269,8 @@ class PrintRegionConfig : public virtual StaticPrintConfig
     ConfigOptionInt                 solid_infill_every_layers;
     ConfigOptionFloatOrPercent      solid_infill_speed;
     ConfigOptionBool                thin_walls;
+    ConfigOptionFloatOrPercent      thin_walls_min_width;
+    ConfigOptionFloatOrPercent      thin_walls_overlap;
     ConfigOptionFloatOrPercent      top_infill_extrusion_width;
     ConfigOptionEnum<InfillPattern> top_infill_pattern;
     ConfigOptionInt                 top_solid_layers;
@@ -311,6 +313,8 @@ class PrintRegionConfig : public virtual StaticPrintConfig
         OPT_PTR(solid_infill_every_layers);
         OPT_PTR(solid_infill_speed);
         OPT_PTR(thin_walls);
+        OPT_PTR(thin_walls_min_width);
+        OPT_PTR(thin_walls_overlap);
         OPT_PTR(top_infill_extrusion_width);
         OPT_PTR(top_infill_pattern);
         OPT_PTR(top_solid_infill_speed);
