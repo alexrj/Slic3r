@@ -1118,7 +1118,7 @@ Print::_make_brim()
     
     Polygons loops;
     const int num_loops = floor(this->config.brim_width / flow.width + 0.5);
-    for (int i = num_loops; i >= 1; --i) {
+    for (int i = num_loops+1; i >= 1; --i) {
         // JT_SQUARE ensures no vertex is outside the given offset distance
         // -0.5 because islands are not represented by their centerlines
         // (first offset more, then step back - reverse order than the one used for 
@@ -1127,7 +1127,7 @@ Print::_make_brim()
             islands,
             flow.scaled_width() + flow.scaled_spacing() * (i - 1.5 + 0.5),
             flow.scaled_spacing() * -0.525, // WORKAROUND for brim placement, original 0.5 leaves too much of a gap.
-            100000,
+            CLIPPER_OFFSET_SCALE,
             ClipperLib::jtSquare
         ));
     }

@@ -71,12 +71,12 @@ SCENARIO("Original Slic3r Skirt/Brim tests", "[!mayfail]") {
     Slic3r::Model model;
     auto gcode {std::stringstream("")};
     gcode.clear();
+    const double used_layer_height = 0.01;
     GIVEN("A default configuration") {
         auto config {Config::new_from_defaults()};
         config->set("support_material_speed", 99);
-        config->set("first_layer_height", 0.3);
+        config->set("first_layer_height", used_layer_height);
         config->set("gcode_comments", true);
-
         // avoid altering speeds unexpectedly
         config->set("cooling", false);
         config->set("first_layer_speed", "100%");
@@ -88,14 +88,23 @@ SCENARIO("Original Slic3r Skirt/Brim tests", "[!mayfail]") {
             config->set("perimeters", 0);
             config->set("skirts", 0);
             config->set("brim_width", 5);
+            config->set("interior_brim_width", 0);
+            config->set("brim_connections_width", 0);
+            config->set("first_layer_extrusion_width", 0.10);
+            config->set("extrusion_width", 0.10);
+            config->set("nozzle_diameter", "0.05");
+            THEN("Configuration is sane.") {
+                REQUIRE(config->get<ConfigOptionFloatOrPercent>("first_layer_extrusion_width").get_abs_value(used_layer_height) > 0.05);
+                REQUIRE(used_layer_height < 0.05);
+            }
             THEN("Brim is generated") {
                 auto print {Slic3r::Test::init_print({TestMesh::cube_20x20x20}, model, config)};
                 Slic3r::Test::gcode(gcode, print);
                 bool brim_generated = false;
                 auto support_speed = config->get<ConfigOptionFloat>("support_material_speed") * MM_PER_MIN;
-                parser.parse_stream(gcode, [&brim_generated, support_speed] (Slic3r::GCodeReader& self, const Slic3r::GCodeReader::GCodeLine& line)
+                parser.parse_stream(gcode, [&brim_generated, support_speed, used_layer_height] (Slic3r::GCodeReader& self, const Slic3r::GCodeReader::GCodeLine& line)
                     {
-                        if (self.Z == Approx(0.3) || line.new_Z() == Approx(0.3)) {
+                        if (self.Z == Approx(used_layer_height) || line.new_Z() == Approx(used_layer_height)) {
                             if (line.extruding() && self.F == Approx(support_speed)) {
                                 brim_generated = true;
                             }
@@ -103,6 +112,31 @@ SCENARIO("Original Slic3r Skirt/Brim tests", "[!mayfail]") {
                     });
                 REQUIRE(brim_generated);
             }
+            THEN("Brim width is 5mm around the object.") {
+                auto print {Slic3r::Test::init_print({TestMesh::cube_20x20x20}, model, config, false, Slic3r::Pointf(0, 0))};
+                Slic3r::Test::gcode(gcode, print);
+                double max_x = 0, min_x = 0, max_y = 0, min_y = 0;
+                auto support_speed = config->get<ConfigOptionFloat>("support_material_speed") * MM_PER_MIN;
+                auto line_width = config->get<ConfigOptionFloatOrPercent>("first_layer_extrusion_width").get_abs_value(used_layer_height);
+                auto brim = config->get<ConfigOptionFloat>("brim_width");
+                parser.parse_stream(gcode, [&max_x, &max_y, &min_x, &min_y, line_width, support_speed, used_layer_height] (Slic3r::GCodeReader& self, const Slic3r::GCodeReader::GCodeLine& line)
+                    {
+                        if (self.Z == Approx(used_layer_height) || line.new_Z() == Approx(used_layer_height)) {
+                            if (line.extruding() && self.F == Approx(support_speed)) {
+                                max_x = std::max(double(self.X), max_x);
+                                min_x = std::min(double(self.X), min_x);
+                                max_y = std::max(double(self.Y), max_y);
+                                min_y = std::min(double(self.Y), min_y);
+                            }
+                        }
+                    });
+                // match the centerline of our extrusion min/max, should be very close to +/-15mm
+                REQUIRE(max_x == Approx(15.0-(line_width / 2.0)).epsilon(line_width * 0.01));
+                REQUIRE(max_y == Approx(15.0-(line_width / 2.0)).epsilon(line_width * 0.01));
+                REQUIRE(min_x == Approx(-15.0+(line_width / 2.0)).epsilon(line_width * 0.01));
+                REQUIRE(min_y == Approx(-15.0+(line_width / 2.0)).epsilon(line_width * 0.01));
+            }
+
         }
 
         WHEN("Skirt area is smaller than the brim") {

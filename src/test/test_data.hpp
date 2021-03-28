@@ -65,8 +65,8 @@ bool _equiv(const T& a, const T& b, double epsilon) { return abs(a - b) < epsilo
 
 Slic3r::Model model(const std::string& model_name, TriangleMesh&& _mesh);
 
-shared_Print init_print(std::initializer_list<TestMesh> meshes, Slic3r::Model& model, config_ptr _config = Slic3r::Config::new_from_defaults(), bool comments = false);
-shared_Print init_print(std::initializer_list<TriangleMesh> meshes, Slic3r::Model& model, config_ptr _config = Slic3r::Config::new_from_defaults(), bool comments = false);
+shared_Print init_print(std::initializer_list<TestMesh> meshes, Slic3r::Model& model, config_ptr _config = Slic3r::Config::new_from_defaults(), bool comments = false, Slic3r::Pointf center = Slic3r::Pointf(100,100));
+shared_Print init_print(std::initializer_list<TriangleMesh> meshes, Slic3r::Model& model, config_ptr _config = Slic3r::Config::new_from_defaults(), bool comments = false, Slic3r::Pointf center = Slic3r::Pointf(100,100));
 
 void gcode(std::stringstream& gcode, shared_Print print);
 

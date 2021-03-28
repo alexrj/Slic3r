@@ -201,7 +201,7 @@ TriangleMesh mesh(TestMesh m) {
 }
 
 
-shared_Print init_print(std::initializer_list<TestMesh> meshes, Slic3r::Model& model, config_ptr _config, bool comments) {
+shared_Print init_print(std::initializer_list<TestMesh> meshes, Slic3r::Model& model, config_ptr _config, bool comments, Slic3r::Pointf center) {
     auto config {Slic3r::Config::new_from_defaults()};
     config->apply(_config);
 
@@ -224,7 +224,7 @@ shared_Print init_print(std::initializer_list<TestMesh> meshes, Slic3r::Model& m
     }
 
     model.arrange_objects(print->config.min_object_distance());
-    model.center_instances_around_point(Slic3r::Pointf(100,100));
+    model.center_instances_around_point(center);
     for (auto* mo : model.objects) {
         print->auto_assign_extruders(mo);
         print->add_model_object(mo);
@@ -234,7 +234,7 @@ shared_Print init_print(std::initializer_list<TestMesh> meshes, Slic3r::Model& m
 
     return print;
 }
-shared_Print init_print(std::initializer_list<TriangleMesh> meshes, Slic3r::Model& model, config_ptr _config, bool comments) {
+shared_Print init_print(std::initializer_list<TriangleMesh> meshes, Slic3r::Model& model, config_ptr _config, bool comments, Slic3r::Pointf center) {
     auto config {Slic3r::Config::new_from_defaults()};
     config->apply(_config);
 
@@ -257,7 +257,7 @@ shared_Print init_print(std::initializer_list<TriangleMesh> meshes, Slic3r::Mode
     }
 
     model.arrange_objects(print->config.min_object_distance());
-    model.center_instances_around_point(Slic3r::Pointf(100,100));
+    model.center_instances_around_point(center);
     for (auto* mo : model.objects) {
         print->auto_assign_extruders(mo);
         print->add_model_object(mo);
