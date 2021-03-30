@@ -23,8 +23,7 @@ public:
     
     BridgeDetector(const ExPolygon &_expolygon, const ExPolygonCollection &_lower_slices, coord_t _extrusion_width);
     bool detect_angle();
-    Polygons coverage() const;
-    Polygons coverage(double angle) const;
+    Polygons coverage(double angle = -1, bool precise = false) const;
     
     /// Return the bridge edges that are not currently supported but would permit use of the supplied
     /// bridge angle if it was supported.

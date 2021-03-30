@@ -301,7 +301,8 @@ GCode::extrude(ExtrusionLoop loop, std::string description, double speed)
     // next copies (if any) would not detect the correct orientation
     
     // extrude all loops ccw
-    bool was_clockwise = loop.make_counter_clockwise();
+    // no! this was decided by the generator, he know better than us.
+    bool was_clockwise = false;// loop.make_counter_clockwise();
     
     SeamPosition seam_position = this->config.seam_position;
     if (loop.role == elrSkirt) seam_position = spNearest;

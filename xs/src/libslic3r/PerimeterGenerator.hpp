@@ -19,11 +19,17 @@ public:
     // Is it a contour or a hole?
     // Contours are CCW oriented, holes are CW oriented.
     bool is_contour;
+    //overhang may need to be reversed
+    bool is_overhang;
     // Depth in the hierarchy. External perimeter has depth = 0. An external perimeter could be both a contour and a hole.
     unsigned short depth;
     // Children contour, may be both CCW and CW oriented (outer contours or holes).
     std::vector<PerimeterGeneratorLoop> children;
     
+    PerimeterGeneratorLoop(Polygon polygon, unsigned short depth, bool is_contour) :
+        polygon(polygon), is_contour(is_contour), depth(depth), is_overhang(false) {}
+    PerimeterGeneratorLoop(Polygon polygon, unsigned short depth, bool is_contour, bool is_overhang) :
+        polygon(polygon), is_contour(is_contour), depth(depth), is_overhang(is_overhang) {}
     PerimeterGeneratorLoop(Polygon polygon, unsigned short depth)
         : polygon(polygon), is_contour(false), depth(depth)
         {};

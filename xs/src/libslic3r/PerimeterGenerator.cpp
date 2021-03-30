@@ -1,5 +1,6 @@
 #include "PerimeterGenerator.hpp"
 #include "ClipperUtils.hpp"
+#include "BridgeDetector.hpp"
 #include "ExtrusionEntityCollection.hpp"
 #include <cmath>
 #include <cassert>
@@ -69,7 +70,7 @@ PerimeterGenerator::process()
                 loops = min_loops;
         }
 
-        const int loop_number = loops-1;  // 0-indexed loops
+        int loop_number = loops-1;  // 0-indexed loops
         
 
         Polygons gaps;
@@ -80,6 +81,52 @@ PerimeterGenerator::process()
             std::vector<PerimeterGeneratorLoops> contours(loop_number+1);    // depth => loops
             std::vector<PerimeterGeneratorLoops> holes(loop_number+1);       // depth => loops
             ThickPolylines thin_walls;
+			
+			
+			// We can add more perimeters if there are uncovered overhangs
+			bool has_overhang = false;
+			if (this->config->extra_perimeters && !last.empty()
+				&& this->lower_slices != NULL && !this->lower_slices->expolygons.empty()){
+				//split the polygons with bottom/notbottom
+				ExPolygons unsupported = diff_ex(last, to_polygons(this->lower_slices->expolygons), true);
+				if (!unsupported.empty()) {
+					//only consider overhangs and let bridges alone
+					int numploy = 0;
+					//only consider the bottom layer that intersect unsupported, to be sure it's only on our island.
+					ExPolygonCollection lower_island(diff_ex(last, to_polygons(unsupported), true));
+					Polygons bridges;
+					for(ExPolygon &one_hole : unsupported){
+						BridgeDetector detector(one_hole,
+							lower_island,
+							pspacing);
+						if (detector.detect_angle()) {
+							Polygons  hole_bridges = detector.coverage(detector.angle, true);
+							bridges.insert(bridges.end(), hole_bridges.begin(), hole_bridges.end());
+						}
+					}
+					//now that we have detected the bridges, we can see if we have an overhang area
+					if (!bridges.empty()) {
+						ExPolygons bridgeable = union_ex(bridges);
+						//simplify to avoid most of artefacts from printing lines.
+						ExPolygons bridgeable_simplified;
+						for (ExPolygon &poly : bridgeable) {
+							poly.simplify(pspacing / 2, &bridgeable_simplified);
+						}
+						
+						if (!bridgeable_simplified.empty())
+							bridgeable_simplified = offset_ex(bridgeable_simplified, pspacing/1.9);
+						if (!bridgeable_simplified.empty()) {
+							//offset by perimeter spacing because the simplify may have reduced it a bit.
+							unsupported = diff_ex(unsupported, bridgeable_simplified, true);
+						}
+					}
+					if (!unsupported.empty()) {
+						//allow to add an other perimeter
+						has_overhang = true;
+					}
+				}
+			}
+
             
             // we loop one time more than needed in order to find gaps after the last perimeter was applied
             for (int i = 0; i <= loop_number+1; ++i) {  // outer loop is 0
@@ -181,19 +228,43 @@ PerimeterGenerator::process()
                     }
                 }
                 
-                if (offsets.empty()) break;
-                if (i > loop_number) break; // we were only looking for gaps this time
+                // if (offsets.empty()) break;
+                // if (i > loop_number) break; // we were only looking for gaps this time
                 
-                last = offsets;
-                for (Polygons::const_iterator polygon = offsets.begin(); polygon != offsets.end(); ++polygon) {
-                    PerimeterGeneratorLoop loop(*polygon, i);
-                    loop.is_contour = polygon->is_counter_clockwise();
-                    if (loop.is_contour) {
-                        contours[i].push_back(loop);
+                if (offsets.empty()) {
+                    // Store the number of loops actually generated.
+                    loop_number = i - 1;
+                    break;
+                } else if (i > loop_number) {
+                    if (has_overhang) {
+                        loop_number++;
+                        contours.emplace_back();
+                        holes.emplace_back();
                     } else {
-                        holes[i].push_back(loop);
+                        // If i > loop_number, we were looking just for gaps.
+                        break;
                     }
                 }
+                
+                for (const Polygon &polygon : offsets) {
+					if(polygon.is_counter_clockwise()){
+						contours[i].emplace_back(PerimeterGeneratorLoop(polygon, i, true, has_overhang));
+					}else{
+						holes[i].emplace_back(PerimeterGeneratorLoop(polygon, i, false, has_overhang));
+					}
+                }
+                last = std::move(offsets);
+				
+                // last = offsets;
+                // for (Polygons::const_iterator polygon = offsets.begin(); polygon != offsets.end(); ++polygon) {
+                    // PerimeterGeneratorLoop loop(*polygon, i);
+                    // loop.is_contour = polygon->is_counter_clockwise();
+                    // if (loop.is_contour) {
+                        // contours[i].push_back(loop);
+                    // } else {
+                        // holes[i].push_back(loop);
+                    // }
+                // }
             }
             
             // nest loops: holes first
@@ -450,7 +521,10 @@ PerimeterGenerator::_traverse_loops(const PerimeterGeneratorLoops &loops,
             
             ExtrusionEntityCollection children = this->_traverse_loops(loop.children, thin_walls);
             if (loop.is_contour) {
-                eloop.make_counter_clockwise();
+                if (loop.is_overhang && this->layer_id % 2 == 1)
+                    eloop.make_clockwise();
+                else
+					eloop.make_counter_clockwise();
                 entities.append(children.entities);
                 entities.append(eloop);
             } else {

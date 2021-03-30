@@ -181,15 +181,11 @@ BridgeDetector::detect_angle()
 }
 
 Polygons
-BridgeDetector::coverage() const
+BridgeDetector::coverage(double angle, bool precise) const
 {
-    if (this->angle == -1) return Polygons();
-    return this->coverage(this->angle);
-}
-
-Polygons
-BridgeDetector::coverage(double angle) const
-{
+    if (angle == -1) angle = this->angle;
+    if (angle == -1) return Polygons();
+	
     // Clone our expolygon and rotate it so that we work with vertical lines.
     ExPolygon expolygon = this->expolygon;
     expolygon.rotate(PI/2.0 - angle, Point(0,0));
@@ -214,18 +210,46 @@ BridgeDetector::coverage(double angle) const
     }
     
     Polygons covered;
-    for (const Polygon &trapezoid : trapezoids) {
-        Lines supported = intersection_ln(trapezoid.lines(), anchors);
+    for (Polygon &trapezoid : trapezoids) {
         
-        // not nice, we need a more robust non-numeric check
-        for (size_t i = 0; i < supported.size(); ++i) {
-            if (supported[i].length() < this->extrusion_width) {
-                supported.erase(supported.begin() + i);
-                i--;
-            }
-        }
+		size_t n_supported = 0;
+		if (!precise) {
+			// not nice, we need a more robust non-numeric check
+			for (const Line &supported_line : intersection_ln(trapezoid.lines(), anchors))
+				if (supported_line.length() >= this->extrusion_width)
+					++n_supported;
+		} else {
+			Polygons intersects = intersection(trapezoid, anchors);
+			n_supported = intersects.size();
 
-        if (supported.size() >= 2) covered.push_back(trapezoid);        
+			if (n_supported >= 2) {
+				// trim it to not allow to go outside of the intersections
+				BoundingBox center_bound = intersects[0].bounding_box();
+				coord_t min_y = center_bound.center().y, max_y = center_bound.center().y;
+				for (const Polygon &poly_bound : intersects) {
+					center_bound = poly_bound.bounding_box();
+					if (min_y > center_bound.center().y) min_y = center_bound.center().y;
+					if (max_y < center_bound.center().y) max_y = center_bound.center().y;
+				}
+				coord_t min_x = trapezoid[0].x, max_x = trapezoid[0].x;
+				for (const Point &p : trapezoid.points) {
+					if (min_x > p.x) min_x = p.x;
+					if (max_x < p.x) max_x = p.x;
+				}
+				//add what get_trapezoids3 has removed (+EPSILON)
+				min_x -= (this->extrusion_width / 4 + 1);
+				max_x += (this->extrusion_width / 4 + 1);
+				coord_t mid_x = (min_x + max_x) / 2;
+				for (Point &p : trapezoid.points) {
+					if (p.y < min_y) p.y = min_y;
+					if (p.y > max_y) p.y = max_y;
+					if (p.x > min_x && p.x < mid_x) p.x = min_x;
+					if (p.x < max_x && p.x > mid_x) p.x = max_x;
+				}
+			}
+		}
+
+		if (n_supported >= 2) covered.push_back(trapezoid);        
     }
     
     // merge trapezoids and rotate them back
