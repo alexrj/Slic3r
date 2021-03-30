@@ -199,6 +199,23 @@ SCENARIO("Original Slic3r Skirt/Brim tests", "[!mayfail]") {
             }
         }
 
+        WHEN("brim overlap") {
+            config->set("skirts", 0);
+            config->set("first_layer_extrusion_width", 0.5);
+            config->set("brim_width", 1);
+            config->set("brim_overlap", 15);
+
+            Slic3r::Model model;
+            auto print {Slic3r::Test::init_print({TestMesh::cube_20x20x20}, model, config)};
+            print->process();
+
+            THEN("Gcode generates") {
+                Slic3r::Test::gcode(gcode, print);
+                auto exported {gcode.str()};
+                REQUIRE(exported.size() > 0);
+            }
+        }
+
         WHEN("Object is plated with overhang support and a brim") {
             config->set("layer_height", 0.4);
             config->set("first_layer_height", 0.4);

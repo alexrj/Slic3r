@@ -177,6 +177,17 @@ PrintConfigDef::PrintConfigDef()
     def->max = 180;
     def->default_value = new ConfigOptionFloat(125);
 
+    def = this->add("brim_overlap", coPercent);
+    def->label = __TRANS("Brim/perimeter overlap");
+    def->gui_type = "f_enum_open";
+    def->category = __TRANS("Skirt and brim");
+    def->tooltip = __TRANS("Overlap between the perimeter and brim. Positive values stregthen and negative values weaken bonding.");
+    def->sidetext = "%";
+    def->cli = "brim-overlap=s";
+    def->enum_values.push_back("-3.13%");
+    def->enum_labels.push_back("default");
+    def->default_value = new ConfigOptionPercent(-3.13);
+
     def = this->add("brim_width", coFloat);
     def->label = __TRANS("Exterior brim width");
     def->category = __TRANS("Skirt and brim");

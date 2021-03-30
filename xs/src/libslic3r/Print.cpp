@@ -351,6 +351,7 @@ Print::invalidate_state_by_config(const PrintConfigBase &config)
             || opt_key == "interior_brim_width"
             || opt_key == "brim_ears"
             || opt_key == "brim_ears_max_angle"
+            || opt_key == "brim_overlap"
             || opt_key == "brim_connections_width") {
             steps.insert(psBrim);
             steps.insert(psSkirt);
@@ -1115,18 +1116,19 @@ Print::_make_brim()
             }
         }
     }
-    
+
     Polygons loops;
     const int num_loops = floor(this->config.brim_width / flow.width + 0.5);
     for (int i = num_loops; i >= 1; --i) {
         // JT_SQUARE ensures no vertex is outside the given offset distance
         // -0.5 because islands are not represented by their centerlines
         // (first offset more, then step back - reverse order than the one used for 
-        // perimeters because here we're offsetting outwards)
+        // perimeters because here we're offsetting outwards)
         append_to(loops, offset2(
             islands,
-            flow.scaled_width() + flow.scaled_spacing() * (i - 1.5 + 0.5),
-            flow.scaled_spacing() * -0.525, // WORKAROUND for brim placement, original 0.5 leaves too much of a gap.
+            (flow.scaled_width() * 0.5 + flow.scaled_spacing() *
+             (i - 0.5 - this->config.brim_overlap.get_abs_value(1.0))),
+            flow.scaled_spacing() * -0.5,
             100000,
             ClipperLib::jtSquare
         ));

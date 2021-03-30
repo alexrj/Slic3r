@@ -454,7 +454,7 @@ sub options {
         perimeter_acceleration infill_acceleration bridge_acceleration 
         first_layer_acceleration default_acceleration
         skirts skirt_distance skirt_height min_skirt_length
-        brim_connections_width brim_ears brim_ears_max_angle brim_width interior_brim_width
+        brim_connections_width brim_ears brim_ears_max_angle brim_overlap brim_width interior_brim_width
         support_material support_material_threshold support_material_max_layers support_material_enforce_layers
         raft_layers
         support_material_pattern support_material_spacing support_material_angle
@@ -596,6 +596,7 @@ sub build {
             $optgroup->append_single_option_line('brim_ears');
             $optgroup->append_single_option_line('brim_ears_max_angle');
             $optgroup->append_single_option_line('interior_brim_width');
+            $optgroup->append_single_option_line('brim_overlap');
             $optgroup->append_single_option_line('brim_connections_width');
         }
     }
@@ -953,6 +954,7 @@ sub _update {
     
     $self->get_field('brim_ears')->toggle($have_brim);
     $self->get_field('brim_ears_max_angle')->toggle($have_brim && $config->brim_ears);
+    $self->get_field('brim_overlap')->toggle($have_brim);
     
     my $have_support_material = $config->support_material || $config->raft_layers > 0;
     my $have_support_interface = $config->support_material_interface_layers > 0;

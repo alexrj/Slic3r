@@ -437,6 +437,7 @@ class PrintConfig : public GCodeConfig
     ConfigOptionFloat               brim_connections_width;
     ConfigOptionBool                brim_ears;
     ConfigOptionFloat               brim_ears_max_angle;
+    ConfigOptionPercent             brim_overlap;
     ConfigOptionFloat               brim_width;
     ConfigOptionBool                complete_objects;
     ConfigOptionBool                cooling;
@@ -501,6 +502,7 @@ class PrintConfig : public GCodeConfig
         OPT_PTR(brim_connections_width);
         OPT_PTR(brim_ears);
         OPT_PTR(brim_ears_max_angle);
+        OPT_PTR(brim_overlap);
         OPT_PTR(brim_width);
         OPT_PTR(complete_objects);
         OPT_PTR(cooling);
