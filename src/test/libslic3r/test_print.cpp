@@ -138,8 +138,18 @@ SCENARIO("Print: Brim generation") {
             config->set("first_layer_extrusion_width", 0.5);
             auto print {Slic3r::Test::init_print({m}, model, config)};
             print->make_brim();
-            THEN("Brim Extrusion collection has 12 loops in it") {
-                REQUIRE(print->brim.items_count() == 12);
+            double nbLoops = 6.0 / print->brim_flow().spacing();
+            THEN("Brim Extrusion collection has " + std::to_string(nbLoops) + " loops in it (flow="+ std::to_string(print->brim_flow().spacing())+")") {
+                REQUIRE(print->brim.items_count() == floor(nbLoops));
+            }
+        }
+        WHEN("Brim ears activated, 3mm") {
+            config->set("brim_width", 3);
+            config->set("brim_ears", true);
+            shared_Print print{ Slic3r::Test::init_print({m}, model, config) };
+            print->process();
+            THEN("Brim ears Extrusion collection has 4 extrusions in it") {
+                REQUIRE(print->brim.items_count() == 4);
             }
         }
     }

@@ -127,12 +127,20 @@ SCENARIO("Flow: Flow math for non-bridges", "[!mayfail]") {
                 auto flow {Flow::new_from_config_width(frPerimeter, ConfigOptionFloatOrPercent(0, false), nozzle_diameter, layer_height, 0.0f)};
                 REQUIRE(flow.width == Approx(1.4*nozzle_diameter));
             }
+            THEN("Min width is respected") {
+                auto flow{ Flow::new_from_config_width(frPerimeter, ConfigOptionFloatOrPercent{0, false}, nozzle_diameter, layer_height, 0.0f) };
+                REQUIRE(flow.width >= Approx(1.05*nozzle_diameter));
+            }
         }
         WHEN("Layer height is set to 0.2") {
             layer_height = 0.3f;
             THEN("Min width is set.") {
                 auto flow {Flow::new_from_config_width(frPerimeter, ConfigOptionFloatOrPercent(0, false), nozzle_diameter, layer_height, 0.0f)};
                 REQUIRE(flow.width == Approx(1.05*nozzle_diameter));
+            }
+            THEN("Min width is respected.") {
+                auto flow{ Flow::new_from_config_width(frPerimeter, ConfigOptionFloatOrPercent{0, false}, nozzle_diameter, layer_height, 0.0f) };
+                REQUIRE(flow.width >= Approx(1.05*nozzle_diameter));
             }
         }
     }
