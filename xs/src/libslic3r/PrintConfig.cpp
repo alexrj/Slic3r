@@ -666,6 +666,7 @@ PrintConfigDef::PrintConfigDef()
     def->enum_values.push_back("mach3");
     def->enum_values.push_back("machinekit");
     def->enum_values.push_back("smoothie");
+    def->enum_values.push_back("m3dmicro");
     def->enum_values.push_back("no-extrusion");
     def->enum_labels.push_back("RepRap (Marlin/Sprinter)");
     def->enum_labels.push_back("Repetier");
@@ -675,6 +676,7 @@ PrintConfigDef::PrintConfigDef()
     def->enum_labels.push_back("Mach3/LinuxCNC");
     def->enum_labels.push_back("Machinekit");
     def->enum_labels.push_back("Smoothieware");
+    def->enum_labels.push_back("M3D Micro");
     def->enum_labels.push_back("No extrusion");
     def->default_value = new ConfigOptionEnum<GCodeFlavor>(gcfRepRap);
 

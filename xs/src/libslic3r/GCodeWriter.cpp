@@ -67,7 +67,9 @@ GCodeWriter::preamble()
     std::ostringstream gcode;
 
     if (FLAVOR_IS_NOT(gcfMakerWare)) {
-        gcode << "G21 ; set units to millimeters\n";
+        if (FLAVOR_IS_NOT(gcfM3dMicro)) {
+            gcode << "G21 ; set units to millimeters\n";
+        }
         gcode << "G90 ; use absolute coordinates\n";
     }
     if (FLAVOR_IS(gcfRepRap) || FLAVOR_IS(gcfTeacup) || FLAVOR_IS(gcfRepetier) || FLAVOR_IS(gcfSmoothie)) {
