@@ -670,10 +670,23 @@ GCode::needs_retraction(const Polyline &travel, ExtrusionRole role)
     }
     
     if (role == erSupportMaterial) {
+        // skip retraction if this is a travel move entirely within a support layer
         const SupportLayer* support_layer = dynamic_cast<const SupportLayer*>(this->layer);
-        if (support_layer != NULL && support_layer->support_islands.contains(travel)) {
-            // skip retraction if this is a travel move inside a support material island
-            return false;
+        if (support_layer != NULL) {
+            bool shouldRetract = false;
+            const Lines lines = travel.lines();
+            for (Lines::const_iterator line = lines.begin(); line != lines.end(); ++line) {
+                if (
+                    !support_layer->support_islands.contains(line->a) ||
+                    !support_layer->support_islands.contains(line->b)
+                ) {
+                    shouldRetract = true;
+                    break;
+                }
+            }
+            if (!shouldRetract) {
+                return false;
+            }
         }
     }
     
