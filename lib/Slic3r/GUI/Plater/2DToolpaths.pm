@@ -414,9 +414,9 @@ sub Render {
         my $print_z = $layer->print_z;
         
         # draw brim
-        if ($self->print->step_done(STEP_BRIM) && $layer->id == 0 && !$brim_drawn) {
+        if ($self->print->step_done(STEP_BRIM) && $layer->id < $self->print->brim_count && !$brim_drawn) {
             $self->color(@TOOL_DARK);
-            $self->_draw(undef, $print_z, $_) for @{$self->print->brim};
+            $self->_draw(undef, $print_z, $_) for @{$self->print->brim_layer($layer->id)};
             $brim_drawn = 1;
         }
         if ($self->print->step_done(STEP_SKIRT)

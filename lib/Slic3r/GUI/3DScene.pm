@@ -1443,26 +1443,27 @@ sub load_print_toolpaths {
     }
     
     my $color_by_extruder = $self->color_toolpaths_by eq 'extruder';
-    
-    if (!$print->brim->empty) {
-        my $color = $color_by_extruder
-            ? $self->colors->[ ($print->brim_extruder-1) % @{$self->colors} ]
-            : $self->colors->[2];
-        
-        push @{$self->volumes}, my $volume = Slic3r::GUI::3DScene::Volume->new(
-            bounding_box    => $bb,
-            color           => $color,
-            qverts          => Slic3r::GUI::_3DScene::GLVertexArray->new,
-            tverts          => Slic3r::GUI::_3DScene::GLVertexArray->new,
-            offsets         => {},  # print_z => [ qverts, tverts ]
-        );
-        
-        my $top_z = $print->get_object(0)->get_layer(0)->print_z;
-        $volume->offsets->{$top_z} = [0, 0];
-        $self->_extrusionentity_to_verts($print->brim, $top_z, Slic3r::Point->new(0,0),
-            $volume->qverts, $volume->tverts);
+
+    if ($print->brim_count > 0) {  # hack out brim display because of experimental brim.
+        for (my $id = 0; $id < $print->brim_count; $id++) {
+            my $color = $color_by_extruder
+                ? $self->colors->[ ($print->brim_extruder-1) % @{$self->colors} ]
+                : $self->colors->[2];
+
+            push @{$self->volumes}, my $volume = Slic3r::GUI::3DScene::Volume->new(
+                bounding_box    => $bb,
+                color           => $color,
+                qverts          => Slic3r::GUI::_3DScene::GLVertexArray->new,
+                tverts          => Slic3r::GUI::_3DScene::GLVertexArray->new,
+                offsets         => {},  # print_z => [ qverts, tverts ]
+            );
+
+            my $top_z = $print->get_object(0)->get_layer($id)->print_z;
+            $volume->offsets->{$top_z} = [0, 0];
+            $self->_extrusionentity_to_verts($print->brim_layer($id), $top_z, Slic3r::Point->new(0,0),
+                $volume->qverts, $volume->tverts);
+        }
     }
-    
     if (!$print->skirt->empty) {
         # TODO: it's a bit difficult to predict skirt extruders with the current skirt logic.
         # We need to rewrite it anyway.

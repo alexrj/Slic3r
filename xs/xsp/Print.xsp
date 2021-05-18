@@ -178,8 +178,13 @@ _constant()
     // TODO: status_cb
     Ref<ExtrusionEntityCollection> skirt()
         %code%{ RETVAL = &THIS->skirt; %};
-    Ref<ExtrusionEntityCollection> brim()
+    Ref<std::vector<ExtrusionEntityCollection> > brim()
         %code%{ RETVAL = &THIS->brim; %};
+
+    Ref<ExtrusionEntityCollection> brim_layer(int id)
+        %code%{ RETVAL = &(THIS->brim.at(id)); %};
+    size_t brim_count()
+        %code%{ RETVAL = THIS->brim.size(); %};
 
     PrintObjectPtrs* objects()
         %code%{ RETVAL = &THIS->objects; %};
@@ -288,7 +293,7 @@ _constant()
     Clone<Flow> brim_flow();
     Clone<Flow> skirt_flow();
     void make_skirt();
-    void _make_brim();
+    void _make_brim(size_t i);
 %{
 
 double

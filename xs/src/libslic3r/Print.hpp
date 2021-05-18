@@ -242,7 +242,8 @@ class Print
     PrintState<PrintStep> state;
 
     // ordered collections of extrusion paths to build skirt loops and brim
-    ExtrusionEntityCollection skirt, brim;
+    ExtrusionEntityCollection skirt;
+    std::vector<ExtrusionEntityCollection> brim;
     double skirt_height_z {-1.0};
 
     Print();
@@ -294,7 +295,7 @@ class Print
     double skirt_first_layer_height() const;
     Flow brim_flow() const;
     Flow skirt_flow() const;
-    void _make_brim();
+    void _make_brim(size_t i);
 
     /// Generates a skirt around the union of all of 
     /// the objects in the print.

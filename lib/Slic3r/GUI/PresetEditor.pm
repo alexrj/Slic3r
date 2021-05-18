@@ -454,7 +454,7 @@ sub options {
         perimeter_acceleration infill_acceleration bridge_acceleration 
         first_layer_acceleration default_acceleration
         skirts skirt_distance skirt_height min_skirt_length
-        brim_connections_width brim_ears brim_ears_max_angle brim_width interior_brim_width
+        brim_connections_width brim_layers brim_ears brim_ears_max_angle brim_width interior_brim_width
         support_material support_material_threshold support_material_max_layers support_material_enforce_layers
         raft_layers
         support_material_pattern support_material_spacing support_material_angle
@@ -594,6 +594,7 @@ sub build {
             my $optgroup = $page->new_optgroup('Brim');
             $optgroup->append_single_option_line('brim_width');
             $optgroup->append_single_option_line('brim_ears');
+            $optgroup->append_single_option_line('brim_layers');
             $optgroup->append_single_option_line('brim_ears_max_angle');
             $optgroup->append_single_option_line('interior_brim_width');
             $optgroup->append_single_option_line('brim_connections_width');

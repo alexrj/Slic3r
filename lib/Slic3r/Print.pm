@@ -265,7 +265,9 @@ sub make_brim {
     $self->make_skirt;
     
     $self->status_cb->(88, "Generating brim");
-    $self->_make_brim;
+    for (my $i = 0; $i < $self->config->brim_layers; $i++) {
+        $self->_make_brim($i);
+    }
 }
 
 # Wrapper around the C++ Slic3r::Print::validate()

@@ -540,13 +540,14 @@ sub process_layer {
     }
     
     # extrude brim
-    if (!$self->_brim_done) {
+    if ($layer->id < $self->print->brim_count) {
+        print("Layer: " . $layer->id. " size: " . $self->print->brim_count . "\n");
+        my $brim = $self->print->brim_layer($layer->id);
         $gcode .= $self->_gcodegen->set_extruder($self->print->brim_extruder-1);
         $self->_gcodegen->set_origin(Slic3r::Pointf->new(0,0));
         $self->_gcodegen->avoid_crossing_perimeters->set_use_external_mp(1);
         $gcode .= $self->_gcodegen->extrude($_, 'brim', $object->config->support_material_speed)
-            for @{$self->print->brim};
-        $self->_brim_done(1);
+            for @{$brim};
         $self->_gcodegen->avoid_crossing_perimeters->set_use_external_mp(0);
         
         # allow a straight travel move to the first object point

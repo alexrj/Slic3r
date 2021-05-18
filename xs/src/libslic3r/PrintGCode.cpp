@@ -558,14 +558,14 @@ PrintGCode::process_layer(size_t idx, const Layer* layer, const Points& copies)
     }
 
     // extrude brim
-    if (!this->_brim_done) {
+    if (layer->id() < _print.brim.size()) {
+        ExtrusionEntityCollection& local_brim { _print.brim.at(layer->id())};
         gcode += _gcodegen.set_extruder(_print.brim_extruder() - 1);
         _gcodegen.set_origin(Pointf(0,0));
         _gcodegen.avoid_crossing_perimeters.use_external_mp = true;
-        for (const auto& b : _print.brim.entities) {
+        for (const auto& b : local_brim.entities) {
             gcode += _gcodegen.extrude(*b, "brim", obj.config.get_abs_value("support_material_speed"));
         }
-        this->_brim_done = true;
         _gcodegen.avoid_crossing_perimeters.use_external_mp = false;
 
         // allow a straight travel move to the first object point

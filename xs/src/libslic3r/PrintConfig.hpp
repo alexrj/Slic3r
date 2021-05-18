@@ -438,6 +438,7 @@ class PrintConfig : public GCodeConfig
     ConfigOptionBool                brim_ears;
     ConfigOptionFloat               brim_ears_max_angle;
     ConfigOptionFloat               brim_width;
+    ConfigOptionInt                 brim_layers;
     ConfigOptionBool                complete_objects;
     ConfigOptionBool                cooling;
     ConfigOptionFloat               default_acceleration;
@@ -502,6 +503,7 @@ class PrintConfig : public GCodeConfig
         OPT_PTR(brim_ears);
         OPT_PTR(brim_ears_max_angle);
         OPT_PTR(brim_width);
+        OPT_PTR(brim_layers);
         OPT_PTR(complete_objects);
         OPT_PTR(cooling);
         OPT_PTR(default_acceleration);

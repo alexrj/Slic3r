@@ -185,6 +185,15 @@ PrintConfigDef::PrintConfigDef()
     def->cli = "brim-width=f";
     def->min = 0;
     def->default_value = new ConfigOptionFloat(0);
+
+    def = this->add("brim_layers", coInt);
+    def->label = __TRANS("Brim layers");
+    def->category = __TRANS("Skirt and brim");
+    def->tooltip = __TRANS("Number of layers to place the brim.");
+    def->sidetext = "";
+    def->cli = "brim-layers=i";
+    def->min = 1;
+    def->default_value = new ConfigOptionInt(1);
     
     def = this->add("compatible_printers", coStrings);
     def->label = __TRANS("Compatible printers");

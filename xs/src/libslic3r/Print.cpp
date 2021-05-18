@@ -133,7 +133,11 @@ Print::make_brim()
     this->state.set_started(psBrim);
     if (this->status_cb != nullptr)
         this->status_cb(88, "Generating brim");
-    this->_make_brim();
+    // since this method must be idempotent, we clear brim paths *before*
+    // checking whether we need to generate them
+    this->brim.clear();
+    for (size_t i = 0; i < this->config.brim_layers; i++)
+        this->_make_brim(i);
     this->state.set_done(psBrim);
 }
 
@@ -1065,14 +1069,11 @@ Print::skirt_flow() const
 }
 
 void
-Print::_make_brim()
+Print::_make_brim(size_t i)
 {
     if (this->state.is_done(psBrim)) return;
     this->state.set_started(psBrim);
     
-    // since this method must be idempotent, we clear brim paths *before*
-    // checking whether we need to generate them
-    this->brim.clear();
     
     if (this->objects.empty()
         || (this->config.brim_width == 0
@@ -1089,9 +1090,11 @@ Print::_make_brim()
     const coord_t grow_distance = flow.scaled_width()/2;
     Polygons islands;
     Points pt_ears;
+    ExtrusionEntityCollection tmp_brim;
+    tmp_brim.clear();
     
     for (PrintObject* object : this->objects) {
-        const Layer* layer0 = object->get_layer(0);
+        const Layer* layer0 = object->get_layer(i);
         
         Polygons object_islands = layer0->slices.contours();
         
@@ -1246,7 +1249,7 @@ Print::_make_brim()
         for (Polyline &to_extrude : lines_sorted) {
             ExtrusionPath path(erSkirt, mm3_per_mm, flow.width, flow.height);
             path.polyline = to_extrude;
-            this->brim.append(path);
+            tmp_brim.append(path);
         }
     }
     else
@@ -1255,7 +1258,7 @@ Print::_make_brim()
         for (Polygons::const_reverse_iterator p = chained.rbegin(); p != chained.rend(); ++p) {
             ExtrusionPath path(erSkirt, mm3_per_mm, flow.width, flow.height);
             path.polyline = p->split_at_first_point();
-            this->brim.append(ExtrusionLoop(path));
+            tmp_brim.append(ExtrusionLoop(path));
         }
     }
     
@@ -1311,7 +1314,7 @@ Print::_make_brim()
                 for (Polylines::const_iterator pl = paths.begin(); pl != paths.end(); ++pl) {
                     ExtrusionPath path(erSkirt, mm3_per_mm, flow.width, flow.height);
                     path.polyline = *pl;
-                    this->brim.append(path);
+                    tmp_brim.append(path);
                 }
             }
         }
@@ -1354,11 +1357,12 @@ Print::_make_brim()
         for (const Polygon &p : loops) {
             ExtrusionPath path(erSkirt, mm3_per_mm, flow.width, flow.height);
             path.polyline = p.split_at_first_point();
-            this->brim.append(ExtrusionLoop(path));
+            tmp_brim.append(ExtrusionLoop(path));
         }
     }
-    
-    this->state.set_done(psBrim);
+    this->brim.push_back(tmp_brim);
+    if (this->brim.size() == (this->config.brim_layers))
+        this->state.set_done(psBrim);
 }
 
 

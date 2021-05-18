@@ -13,6 +13,7 @@
 %typemap{std::vector<unsigned int>};
 %typemap{std::vector<unsigned int>*};
 %typemap{std::vector<std::string>};
+%typemap{Ref< std::vector<ExtrusionEntityCollection> >};
 %typemap{t_layer_height_ranges};
 %typemap{void*};
 %typemap{SV*};
