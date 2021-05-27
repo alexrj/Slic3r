@@ -218,6 +218,14 @@ Line::ccw(const Point& point) const
     return point.ccw(*this);
 }
 
+coord_t
+Line::dot(const Line &l2) const
+{
+    Vector v_1 = vector();
+    Vector v_2 = l2.vector();
+    return v_1.x*v_2.x + v_1.y*v_2.y;
+}
+
 Pointf3
 Linef3::intersect_plane(double z) const
 {

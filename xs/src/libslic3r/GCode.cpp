@@ -539,6 +539,8 @@ GCode::_extrude(ExtrusionPath path, std::string description, double speed)
             speed = this->config.get_abs_value("top_solid_infill_speed");
         } else if (path.role == erGapFill) {
             speed = this->config.get_abs_value("gap_fill_speed");
+        } else if (path.role == erNone) {
+            speed = this->config.get_abs_value("travel_speed");
         } else {
             CONFESS("Invalid speed");
         }

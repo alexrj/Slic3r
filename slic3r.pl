@@ -464,6 +464,8 @@ $j
     --toolchange-gcode  Load tool-change G-code from the supplied file (default: nothing).
     --seam-position     Position of loop starting points (random/nearest/aligned, default: $config->{seam_position}).
     --external-perimeters-first Reverse perimeter order. (default: no)
+    --perimeter-loop    Join the perimeters in a unique loop (default: no)
+    --perimeter-loop-seam       Position of the perimeter loop switching points (nearest/rear), default: $config->{perimeter_loop_seam}).
     --spiral-vase       Experimental option to raise Z gradually when printing single-walled vases
                         (default: no)
     --only-retract-when-crossing-perimeters

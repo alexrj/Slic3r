@@ -260,6 +260,8 @@ class PrintRegionConfig : public virtual StaticPrintConfig
     ConfigOptionBool                overhangs;
     ConfigOptionInt                 perimeter_extruder;
     ConfigOptionFloatOrPercent      perimeter_extrusion_width;
+    ConfigOptionBool                perimeter_loop;
+    ConfigOptionEnum<SeamPosition>  perimeter_loop_seam;
     ConfigOptionFloat               perimeter_speed;
     ConfigOptionInt                 perimeters;
     ConfigOptionFloatOrPercent      small_perimeter_speed;
@@ -302,6 +304,8 @@ class PrintRegionConfig : public virtual StaticPrintConfig
         OPT_PTR(overhangs);
         OPT_PTR(perimeter_extruder);
         OPT_PTR(perimeter_extrusion_width);
+        OPT_PTR(perimeter_loop);
+        OPT_PTR(perimeter_loop_seam);
         OPT_PTR(perimeter_speed);
         OPT_PTR(perimeters);
         OPT_PTR(small_perimeter_speed);

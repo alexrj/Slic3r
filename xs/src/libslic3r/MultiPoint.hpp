@@ -31,6 +31,21 @@ class MultiPoint
 
     int find_point(const Point &point) const;
     bool has_boundary_point(const Point &point) const;
+    int  closest_point_index(const Point &point) const {
+        int idx = -1;
+        if (! this->points.empty()) {
+            idx = 0;
+            double dist_min = this->points.front().distance_to(point);
+            for (int i = 1; i < int(this->points.size()); ++ i) {
+                double d = this->points[i].distance_to(point);
+                if (d < dist_min) {
+                    dist_min = d;
+                    idx = i;
+                }
+            }
+        }
+        return idx;
+    }
     BoundingBox bounding_box() const;
     
     // Return true if there are exact duplicates.
@@ -44,6 +59,7 @@ class MultiPoint
     void append(const Points::const_iterator &begin, const Points::const_iterator &end);
     bool intersection(const Line& line, Point* intersection) const;
     std::string dump_perl() const;
+    virtual Point point_projection(const Point &point) const;
     
     static Points _douglas_peucker(const Points &points, const double tolerance);
     

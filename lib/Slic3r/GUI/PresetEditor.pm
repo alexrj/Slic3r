@@ -437,7 +437,7 @@ sub options {
     return qw(
         layer_height first_layer_height
         adaptive_slicing adaptive_slicing_quality match_horizontal_surfaces
-        perimeters spiral_vase
+        perimeters perimeter_loop perimeter_loop_seam spiral_vase
         top_solid_layers min_shell_thickness min_top_bottom_shell_thickness bottom_solid_layers
         extra_perimeters avoid_crossing_perimeters thin_walls overhangs
         seam_position external_perimeters_first
@@ -547,6 +547,8 @@ sub build {
             my $optgroup = $page->new_optgroup('Advanced');
             $optgroup->append_single_option_line('seam_position');
             $optgroup->append_single_option_line('external_perimeters_first');
+            $optgroup->append_single_option_line('perimeter_loop');
+            $optgroup->append_single_option_line('perimeter_loop_seam');
         }
     }
     
@@ -890,8 +892,13 @@ sub _update {
         $self->get_field($_)->toggle($have_perimeters)
             for qw(extra_perimeters thin_walls overhangs seam_position external_perimeters_first
                     external_perimeter_extrusion_width
-                    perimeter_speed small_perimeter_speed external_perimeter_speed);
+                    perimeter_speed small_perimeter_speed external_perimeter_speed
+					perimeter_loop perimeter_loop_seam);
     }
+
+    # Disable features that need perimeter_loop to be enabled.    
+    $self->get_field($_)->toggle($config->perimeter_loop)
+        for qw(perimeter_loop_seam);
 
     my $have_adaptive_slicing = $config->adaptive_slicing;
     if (any { /$opt_key/ } qw(all_keys adaptive_slicing)) {

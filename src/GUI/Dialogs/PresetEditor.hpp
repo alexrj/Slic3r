@@ -141,7 +141,7 @@ public:
         {
             "layer_height"s, "first_layer_height"s,
             "adaptive_slicing"s, "adaptive_slicing_quality"s, "match_horizontal_surfaces"s,
-            "perimeters"s, "spiral_vase"s,
+            "perimeters"s, "perimeter_loop"s, "perimeter_loop_seam"s, "spiral_vase"s,
             "top_solid_layers"s, "bottom_solid_layers"s,
             "extra_perimeters"s, "avoid_crossing_perimeters"s, "thin_walls"s, "overhangs"s,
             "seam_position"s, "external_perimeters_first"s,

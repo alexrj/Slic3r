@@ -1006,6 +1006,26 @@ PrintConfigDef::PrintConfigDef()
     def->enum_values.push_back("0");
     def->enum_labels.push_back("default");
     def->default_value = new ConfigOptionFloatOrPercent(0, false);
+	
+    def = this->add("perimeter_loop", coBool);
+    def->label = __TRANS("Looping perimeters");
+    def->category = __TRANS("Layers and Perimeters");
+    def->tooltip = __TRANS("Join the perimeters to create only one continuous extrusion without any z-hop."
+        " Long inside travel (from external to holes) are not extruded to give some place to the infill.");
+    def->cli = "loop-perimeter!";
+    def->default_value = new ConfigOptionBool(false);
+    
+    def = this->add("perimeter_loop_seam", coEnum);
+    def->label = __TRANS("Seam position");
+    def->category = __TRANS("Layers and Perimeters");
+    def->tooltip = __TRANS("Position of perimeters starting points.");
+    def->cli = "perimeter-seam-position=s";
+    def->enum_keys_map = ConfigOptionEnum<SeamPosition>::get_enum_values();
+    def->enum_values.push_back("nearest");
+    def->enum_values.push_back("rear");
+    def->enum_labels.push_back("Nearest");
+    def->enum_labels.push_back("Rear");
+    def->default_value = new ConfigOptionEnum<SeamPosition>(spRear); 
 
     def = this->add("perimeter_speed", coFloat);
     def->label = __TRANS("Perimeters");

@@ -47,6 +47,8 @@ class Point
     static Point new_scale(Pointf p);
     bool operator==(const Point& rhs) const;
     bool operator!=(const Point& rhs) const { return !(*this == rhs); }
+    Point& operator+=(const Point& rhs) { this->x += rhs.x; this->y += rhs.y; return *this; }
+    Point& operator-=(const Point& rhs) { this->x -= rhs.x; this->y -= rhs.y; return *this; }
     std::string wkt() const;
     std::string dump_perl() const;
     void scale(double factor);
@@ -143,6 +145,8 @@ class Pointf
 
 Pointf operator+(const Pointf& point1, const Pointf& point2);
 Pointf operator/(const Pointf& point1, const double& scalar);
+inline coordf_t dot(const Pointf &v1, const Pointf &v2) { return v1.x * v2.x + v1.y * v2.y; }
+inline coordf_t dot(const Pointf &v) { return v.x * v.x + v.y * v.y; }
 
 std::ostream& operator<<(std::ostream &stm, const Pointf3 &pointf3);
 
