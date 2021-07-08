@@ -1687,7 +1687,7 @@ PrintObject::_discover_neighbor_horizontal_shells(LayerRegion* layerm, const siz
             append_to(tmp, to_polygons(internal));
             
             const auto solid_surfaces = diff_ex(to_polygons(s), tmp, true);
-            neighbor_layerm->fill_surfaces.append(solid_surfaces, s.front()->surface_type);
+            neighbor_layerm->fill_surfaces.append(solid_surfaces, *s.front());
         }
     }
 }
