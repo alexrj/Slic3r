@@ -26,8 +26,26 @@ bool App::OnInit()
     this->SetAppName("Slic3r");
     this->notifier = std::unique_ptr<Notifier>();
     
-    if (datadir.empty())
+    if (datadir.empty()) {
+        // SetFileLayout() is only used on Unix systems, needs wxWidgets >= 3.1.1
+        // https://docs.wxwidgets.org/trunk/classwx_standard_paths.html#af5eb9a009b9fd81b748e26d099bb4e89
+        wxStandardPaths::Get().SetFileLayout(wxStandardPaths::FileLayout_Classic);
+
+        // Old location:
+        // Unix: ~/.appinfo
+        // Windows: "C:\Users\username\AppData\Roaming\appinfo" or "C:\Documents and Settings\username\Application Data\appinfo"
+        // Mac: "~/Library/Application Support/appinfo"
         datadir = decode_path(wxStandardPaths::Get().GetUserDataDir());
+
+        if (!wxDirExists(datadir)) {
+            // If there's nothing at the old location use the new configuration folder
+            // Unix: XDG_CONFIG_HOME or ~/.config
+            // Windows: "C:\Users\username\AppData\Roaming" or "C:\Documents and Settings\username\Application Data"
+            // Mac: ~/Library/Preferences
+            wxStandardPaths::Get().SetFileLayout(wxStandardPaths::FileLayout_XDG);
+            datadir = decode_path(wxStandardPaths::Get().GetUserConfigDir()) + "/" + wxApp::GetAppName();
+        }
+    }
     wxString enc_datadir = encode_path(datadir);
     
     const wxString& slic3r_ini  {datadir + "/slic3r.ini"};
@@ -45,7 +63,7 @@ bool App::OnInit()
     /* Check to make sure if datadir exists */
     for (auto& dir : std::vector<wxString> { enc_datadir, print_ini, printer_ini, material_ini }) {
         if (wxDirExists(dir)) continue;
-        if (!wxMkdir(dir)) {
+        if (!wxDir::Make(dir, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL)) {
             Slic3r::Log::fatal_error(LogChannel, (_("Slic3r was unable to create its data directory at ")+ dir).ToStdWstring());
         }
     }
