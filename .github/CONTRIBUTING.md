@@ -57,6 +57,6 @@ contributing to the Slic3r project.
 
 ## Communication
 
-* #slic3r on [FreeNode](https://webchat.freenode.net): talk to _Sound_, _LoH_ or the other members of the Slic3r community.
+* #slic3r on [Libera.Chat](https://libera.chat/): talk to _Sound_, _LoH_ or the other members of the Slic3r community.
 * Drop Alessandro a line at aar@cpan.org.
 * Drop Joseph a line at lenox.joseph@gmail.com
